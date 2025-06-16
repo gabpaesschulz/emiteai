@@ -1,0 +1,3 @@
+ALTER TABLE relatorio
+  ALTER COLUMN status SET NOT NULL,
+  ALTER COLUMN caminho DROP NOT NULL;

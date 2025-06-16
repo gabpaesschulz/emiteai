@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: emiteai
+      POSTGRES_PASSWORD: emiteai
+      POSTGRES_DB: emiteai
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  rabbit:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  api:
+    image: gabrielpaesschulz/emiteai-api:latest
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/emiteai
+      SPRING_DATASOURCE_USERNAME: emiteai
+      SPRING_DATASOURCE_PASSWORD: emiteai
+      SPRING_RABBITMQ_HOST: rabbit
+    depends_on:
+      - postgres
+      - rabbit
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./reports:/reports
+
+  web:
+    image: gabrielpaesschulz/emiteai-web:latest
+    depends_on:
+      - api
+    ports:
+      - "3000:80"
+
+volumes:
+  pgdata:
